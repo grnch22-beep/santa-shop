@@ -10,28 +10,22 @@ const __dirname = dirname(__filename);
 const app = express();
 app.use(cors());
 app.use(express.json());
-
-// Главное — правильно раздаём статические файлы
 app.use(express.static(__dirname));
+
+const BOT_TOKEN = process.env.BOT_TOKEN;
+
+const products = [
+  { id: 1, name: "Пак Аватарок №1", stars: 149, file: "https://pixeldrain.com/u/iCXFrMro" },
+  { id: 2, name: "Пак Аватарок №2", stars: 179, file: "https://pixeldrain.com/u/8ri8oPf2" }
+];
 
 app.get('/', (req, res) => {
   res.sendFile(join(__dirname, 'index.html'));
 });
 
-const BOT_TOKEN = process.env.BOT_TOKEN;
-
-const products = [
-  { id: 1, name: "Космос & Неон", stars: 49 },
-  { id: 2, name: "Аниме стиль", stars: 79 },
-  { id: 3, name: "Минимализм 2026", stars: 119 }
-];
-
 app.post('/create-invoice', async (req, res) => {
   const { items } = req.body;
-
-  if (!items || items.length === 0) {
-    return res.status(400).json({ error: "Нет товаров" });
-  }
+  if (!items || items.length === 0) return res.status(400).json({ error: "Нет товаров" });
 
   const totalStars = items.reduce((sum, id) => {
     const p = products.find(prod => prod.id === id);
@@ -44,7 +38,7 @@ app.post('/create-invoice', async (req, res) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         title: "Покупка аватарок",
-        description: `Набор из ${items.length} товаров`,
+        description: `Набор из ${items.length} пака`,
         payload: JSON.stringify({ items }),
         provider_token: "",
         currency: "XTR",
@@ -56,15 +50,12 @@ app.post('/create-invoice', async (req, res) => {
     if (data.ok) {
       res.json({ invoiceLink: data.result });
     } else {
-      res.status(500).json({ error: data.description || "Ошибка Telegram" });
+      res.status(500).json({ error: data.description });
     }
   } catch (e) {
-    console.error(e);
     res.status(500).json({ error: "Ошибка сервера" });
   }
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`✅ Сервер запущен на порту ${PORT}`);
-});
+app.listen(PORT, () => console.log(`✅ Сервер работает на порту ${PORT}`));
