@@ -1,21 +1,22 @@
 import express from 'express';
 import cors from 'cors';
+import fetch from 'node-fetch';
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-const BOT_TOKEN = process.env.BOT_TOKEN; // берём из переменных Render
+const BOT_TOKEN = process.env.BOT_TOKEN;
 
 const products = [
-  { id: 1, name: "Космос & Неон", stars: 49, file: "https://твоя_ссылка1.zip" },
-  { id: 2, name: "Аниме стиль", stars: 79, file: "https://твоя_ссылка2.zip" },
-  { id: 3, name: "Минимализм 2026", stars: 119, file: "https://твоя_ссылка3.zip" }
+  { id: 1, name: "Космос & Неон", stars: 49 },
+  { id: 2, name: "Аниме стиль", stars: 79 },
+  { id: 3, name: "Минимализм 2026", stars: 119 }
 ];
 
 app.post('/create-invoice', async (req, res) => {
   const { items } = req.body;
-  
+
   if (!items || items.length === 0) {
     return res.status(400).json({ error: "Нет товаров" });
   }
@@ -32,7 +33,7 @@ app.post('/create-invoice', async (req, res) => {
       body: JSON.stringify({
         title: "Покупка аватарок",
         description: `Набор из ${items.length} товаров`,
-        payload: JSON.stringify({ items, timestamp: Date.now() }),
+        payload: JSON.stringify({ items }),
         provider_token: "",
         currency: "XTR",
         prices: [{ label: "Аватарки", amount: totalStars }]
@@ -46,10 +47,12 @@ app.post('/create-invoice', async (req, res) => {
       res.status(500).json({ error: data.description });
     }
   } catch (e) {
+    console.error(e);
     res.status(500).json({ error: "Ошибка сервера" });
   }
 });
 
-app.listen(3000, () => {
-  console.log('Сервер запущен на порту 3000');
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`✅ Сервер запущен на порту ${PORT}`);
 });
