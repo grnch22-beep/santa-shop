@@ -1,10 +1,22 @@
 import express from 'express';
 import cors from 'cors';
 import fetch from 'node-fetch';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+// Главное — правильно раздаём статические файлы
+app.use(express.static(__dirname));
+
+app.get('/', (req, res) => {
+  res.sendFile(join(__dirname, 'index.html'));
+});
 
 const BOT_TOKEN = process.env.BOT_TOKEN;
 
@@ -44,7 +56,7 @@ app.post('/create-invoice', async (req, res) => {
     if (data.ok) {
       res.json({ invoiceLink: data.result });
     } else {
-      res.status(500).json({ error: data.description });
+      res.status(500).json({ error: data.description || "Ошибка Telegram" });
     }
   } catch (e) {
     console.error(e);
