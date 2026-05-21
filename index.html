@@ -6,16 +6,16 @@
   <title>Avatar Shop</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
-    body { font-family: system-ui, sans-serif; background: #0f0f0f; color: #fff; margin: 0; padding: 0; }
+    body { font-family: system-ui, sans-serif; background: #0a0a0a; color: #fff; margin: 0; padding: 0; }
     .header { background: linear-gradient(90deg, #229ed9, #1a7ab8); padding: 20px; text-align: center; font-size: 28px; font-weight: bold; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; padding: 20px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 20px; padding: 20px; }
     .card { background: #1f1f1f; border-radius: 16px; overflow: hidden; text-align: center; transition: 0.3s; }
-    .card:hover { transform: scale(1.05); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
-    .card img { width: 100%; height: 180px; object-fit: cover; }
+    .card:hover { transform: scale(1.06); box-shadow: 0 10px 25px rgba(0,0,0,0.6); }
+    .card img { width: 100%; height: 190px; object-fit: cover; }
     .card h3 { margin: 12px 0 6px; font-size: 16px; }
-    .price { color: #00ff9d; font-weight: bold; font-size: 18px; }
+    .price { color: #00ff9d; font-weight: bold; font-size: 19px; }
     .buy-btn { background: #00c853; color: white; border: none; padding: 14px; width: 100%; font-size: 16px; cursor: pointer; }
-    .cart { position: fixed; bottom: 20px; right: 20px; background: #229ed9; padding: 16px 22px; border-radius: 50px; font-size: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.6); cursor: pointer; z-index: 1000; }
+    .cart { position: fixed; bottom: 20px; right: 20px; background: #229ed9; padding: 16px 24px; border-radius: 50px; font-size: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.6); cursor: pointer; z-index: 1000; }
   </style>
 </head>
 <body>
@@ -38,7 +38,6 @@
         img: "https://i.imgur.com/твоя_картинка.jpg", 
         file: "https://pixeldrain.com/u/iCXFrMro" 
       }
-      // Добавь остальные товары сюда позже
     ];
 
     function renderProducts() {
@@ -58,6 +57,7 @@
       tg.showToast("✅ Добавлено в корзину");
     }
 
+    // Покупка + выдача файла
     document.getElementById('cart').onclick = async () => {
       if (cart.length === 0) return tg.showAlert("Корзина пуста!");
 
@@ -71,11 +71,9 @@
         const data = await response.json();
         if (data.invoiceLink) {
           tg.openInvoice(data.invoiceLink);
-        } else {
-          tg.showAlert("Ошибка создания платежа");
         }
       } catch (e) {
-        tg.showAlert("Ошибка соединения с сервером");
+        tg.showAlert("Ошибка соединения");
       }
     };
 
