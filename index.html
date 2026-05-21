@@ -11,8 +11,12 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Отдаём статические файлы (index.html)
+// Главное — правильно раздаём статические файлы
 app.use(express.static(__dirname));
+
+app.get('/', (req, res) => {
+  res.sendFile(join(__dirname, 'index.html'));
+});
 
 const BOT_TOKEN = process.env.BOT_TOKEN;
 
@@ -52,17 +56,12 @@ app.post('/create-invoice', async (req, res) => {
     if (data.ok) {
       res.json({ invoiceLink: data.result });
     } else {
-      res.status(500).json({ error: data.description });
+      res.status(500).json({ error: data.description || "Ошибка Telegram" });
     }
   } catch (e) {
     console.error(e);
     res.status(500).json({ error: "Ошибка сервера" });
   }
-});
-
-// Главная страница
-app.get('/', (req, res) => {
-  res.sendFile(join(__dirname, 'index.html'));
 });
 
 const PORT = process.env.PORT || 3000;
