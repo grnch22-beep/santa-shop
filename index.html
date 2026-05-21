@@ -3,19 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Avatar Shop</title>
+  <title>Магазин Накрутки</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     body { font-family: system-ui, sans-serif; background: #0a0a0a; color: #fff; margin: 0; padding: 0; }
-    .header { background: linear-gradient(90deg, #229ed9, #1a7ab8); padding: 20px; text-align: center; font-size: 28px; font-weight: bold; }
+    .header { background: linear-gradient(90deg, #8b00ff, #4b0082); padding: 20px; text-align: center; font-size: 28px; font-weight: bold; }
     .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; padding: 20px; }
     .card { background: #1f1f1f; border-radius: 16px; overflow: hidden; text-align: center; transition: 0.3s; }
     .card:hover { transform: scale(1.05); box-shadow: 0 10px 25px rgba(0,0,0,0.6); }
-    .card img { width: 100%; height: 200px; object-fit: cover; }
-    .card h3 { margin: 12px 0 6px; font-size: 16px; }
+    .card img { width: 100%; height: 200px; object-fit: cover; background: #333; }
+    .card h3 { margin: 12px 0 6px; font-size: 15px; }
     .price { color: #00ff9d; font-weight: bold; font-size: 19px; }
     .buy-btn { background: #00c853; color: white; border: none; padding: 14px; width: 100%; font-size: 16px; cursor: pointer; }
-    .cart { position: fixed; bottom: 20px; right: 20px; background: #229ed9; padding: 16px 24px; border-radius: 50px; font-size: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.6); cursor: pointer; z-index: 1000; }
+    .cart { position: fixed; bottom: 20px; right: 20px; background: #8b00ff; padding: 16px 24px; border-radius: 50px; font-size: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.6); cursor: pointer; z-index: 1000; }
   </style>
 </head>
 <body>
@@ -35,21 +35,21 @@
         id: 1, 
         name: "1000 Подписчиков Twitch", 
         stars: 249, 
-        img: "https://pixeldrain.com/api/file/BZth8",   // твоя первая картинка
+        img: "https://pixeldrain.com/api/file/BZth8", 
         file: "https://pixeldrain.com/u/iCXFrMro" 
       },
       { 
         id: 2, 
         name: "5000 Лайков TikTok", 
         stars: 199, 
-        img: "https://pixeldrain.com/api/file/3uk8G",   // вторая картинка
+        img: "https://pixeldrain.com/api/file/3uk8G", 
         file: "https://pixeldrain.com/u/8ri8oPf2" 
       },
       { 
         id: 3, 
         name: "5000 Просмотров TikTok", 
         stars: 179, 
-        img: "https://pixeldrain.com/api/file/HS7Rn",   // третья картинка
+        img: "https://pixeldrain.com/api/file/HS7Rn", 
         file: "https://pixeldrain.com/u/8ri8oPf2" 
       }
     ];
@@ -57,7 +57,7 @@
     function renderProducts() {
       document.getElementById('products').innerHTML = products.map(p => `
         <div class="card">
-          <img src="${p.img}" alt="${p.name}">
+          <img src="${p.img}" alt="${p.name}" onerror="this.src='https://picsum.photos/300/200?random=${p.id}';">
           <h3>${p.name}</h3>
           <p class="price">${p.stars} ⭐ Stars</p>
           <button class="buy-btn" onclick="addToCart(${p.id})">В корзину</button>
