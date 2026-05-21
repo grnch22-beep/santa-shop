@@ -33,10 +33,17 @@
     const products = [
       { 
         id: 1, 
-        name: "Пак аватарок", 
+        name: "Пак Аватарок №1", 
         stars: 149, 
-        img: "https://i.imgur.com/твоя_картинка.jpg", 
+        img: "https://pixeldrain.com/u/9TGHzPTA", 
         file: "https://pixeldrain.com/u/iCXFrMro" 
+      },
+      { 
+        id: 2, 
+        name: "Пак Аватарок №2", 
+        stars: 179, 
+        img: "https://pixeldrain.com/u/1MJnfFmh", 
+        file: "https://pixeldrain.com/u/8ri8oPf2" 
       }
     ];
 
@@ -57,7 +64,6 @@
       tg.showToast("✅ Добавлено в корзину");
     }
 
-    // Покупка + выдача файла
     document.getElementById('cart').onclick = async () => {
       if (cart.length === 0) return tg.showAlert("Корзина пуста!");
 
@@ -73,7 +79,7 @@
           tg.openInvoice(data.invoiceLink);
         }
       } catch (e) {
-        tg.showAlert("Ошибка соединения");
+        tg.showAlert("Ошибка соединения с сервером");
       }
     };
 
