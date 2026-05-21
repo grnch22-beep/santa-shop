@@ -8,10 +8,10 @@
   <style>
     body { font-family: system-ui, sans-serif; background: #0f0f0f; color: #fff; margin: 0; padding: 0; }
     .header { background: linear-gradient(90deg, #229ed9, #1a7ab8); padding: 20px; text-align: center; font-size: 28px; font-weight: bold; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 20px; padding: 20px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; padding: 20px; }
     .card { background: #1f1f1f; border-radius: 16px; overflow: hidden; text-align: center; transition: 0.3s; }
-    .card:hover { transform: scale(1.08); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
-    .card img { width: 100%; height: 170px; object-fit: cover; }
+    .card:hover { transform: scale(1.05); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+    .card img { width: 100%; height: 180px; object-fit: cover; }
     .card h3 { margin: 12px 0 6px; font-size: 16px; }
     .price { color: #00ff9d; font-weight: bold; font-size: 18px; }
     .buy-btn { background: #00c853; color: white; border: none; padding: 14px; width: 100%; font-size: 16px; cursor: pointer; }
@@ -31,9 +31,14 @@
     let cart = [];
 
     const products = [
-      { id: 1, name: "Космос & Неон", stars: 49, img: "https://picsum.photos/id/1015/300/300" },
-      { id: 2, name: "Аниме стиль", stars: 79, img: "https://picsum.photos/id/201/300/300" },
-      { id: 3, name: "Минимализм 2026", stars: 119, img: "https://picsum.photos/id/237/300/300" },
+      { 
+        id: 1, 
+        name: "Пак аватарок", 
+        stars: 149, 
+        img: "https://i.imgur.com/твоя_картинка.jpg", 
+        file: "https://pixeldrain.com/u/iCXFrMro" 
+      }
+      // Добавь остальные товары сюда позже
     ];
 
     function renderProducts() {
@@ -56,17 +61,21 @@
     document.getElementById('cart').onclick = async () => {
       if (cart.length === 0) return tg.showAlert("Корзина пуста!");
 
-      const response = await fetch('https://santa-shop.onrender.com/create-invoice', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ items: cart })
-      });
+      try {
+        const response = await fetch('https://santa-shop.onrender.com/create-invoice', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ items: cart })
+        });
 
-      const data = await response.json();
-      if (data.invoiceLink) {
-        tg.openInvoice(data.invoiceLink);
-      } else {
-        tg.showAlert("Ошибка оплаты");
+        const data = await response.json();
+        if (data.invoiceLink) {
+          tg.openInvoice(data.invoiceLink);
+        } else {
+          tg.showAlert("Ошибка создания платежа");
+        }
+      } catch (e) {
+        tg.showAlert("Ошибка соединения с сервером");
       }
     };
 
