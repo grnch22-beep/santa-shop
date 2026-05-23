@@ -6,24 +6,130 @@
   <title>Santa Shop</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
-    body { font-family: system-ui, sans-serif; background: #0a0a0a; color: #fff; margin: 0; padding: 0; }
-    .header { background: linear-gradient(90deg, #ff3366, #ff9900); padding: 25px; text-align: center; font-size: 32px; font-weight: bold; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 20px; padding: 20px; }
-    .card { background: #1f1f1f; border-radius: 16px; overflow: hidden; text-align: center; transition: 0.3s; }
-    .card:hover { transform: scale(1.05); box-shadow: 0 10px 25px rgba(0,0,0,0.6); }
-    .card img { width: 100%; height: 210px; object-fit: cover; }
+    body { 
+      font-family: system-ui, sans-serif; 
+      background: #0a001f; 
+      color: #fff; 
+      margin: 0; 
+      padding: 0; 
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Анимация снега */
+    .snow {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+      background: transparent;
+    }
+
+    .header { 
+      background: linear-gradient(90deg, #8b00ff, #ff00cc); 
+      padding: 25px; 
+      text-align: center; 
+      font-size: 32px; 
+      font-weight: bold; 
+      position: relative;
+      z-index: 2;
+      box-shadow: 0 0 30px rgba(139, 0, 255, 0.6);
+    }
+
+    .grid { 
+      display: grid; 
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); 
+      gap: 20px; 
+      padding: 20px; 
+      position: relative;
+      z-index: 2;
+    }
+
+    .card { 
+      background: rgba(31, 31, 47, 0.95); 
+      border-radius: 16px; 
+      overflow: hidden; 
+      text-align: center; 
+      transition: 0.3s;
+      border: 1px solid rgba(139, 0, 255, 0.3);
+    }
+
+    .card:hover { 
+      transform: scale(1.05); 
+      box-shadow: 0 0 25px rgba(139, 0, 255, 0.5); 
+    }
+
+    .card img { 
+      width: 100%; 
+      height: 210px; 
+      object-fit: cover; 
+    }
+
     .card h3 { margin: 12px 0 6px; font-size: 16px; }
-    .price { color: #00ff9d; font-weight: bold; font-size: 20px; }
-    .buy-btn { background: #00c853; color: white; border: none; padding: 14px; width: 100%; font-size: 16px; cursor: pointer; }
-    .cart { position: fixed; bottom: 20px; right: 20px; background: #ff3366; padding: 16px 24px; border-radius: 50px; font-size: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.6); cursor: pointer; z-index: 1000; }
+    .price { color: #00ffcc; font-weight: bold; font-size: 20px; text-shadow: 0 0 10px #00ffcc; }
+
+    .buy-btn { 
+      background: linear-gradient(#00ff88, #00cc66); 
+      color: white; 
+      border: none; 
+      padding: 14px; 
+      width: 100%; 
+      font-size: 16px; 
+      cursor: pointer; 
+      font-weight: bold;
+    }
+
+    .cart { 
+      position: fixed; 
+      bottom: 20px; 
+      right: 20px; 
+      background: #8b00ff; 
+      padding: 16px 24px; 
+      border-radius: 50px; 
+      font-size: 20px; 
+      box-shadow: 0 0 20px rgba(139, 0, 255, 0.8); 
+      cursor: pointer; 
+      z-index: 1000; 
+    }
   </style>
 </head>
 <body>
+  <div class="snow" id="snow"></div>
   <div class="header">🎅 Santa Shop</div>
   <div class="grid" id="products"></div>
   <div class="cart" id="cart">🛒 <span id="cart-count">0</span></div>
 
   <script>
+    // Анимация снега
+    function createSnow() {
+      const snowContainer = document.getElementById('snow');
+      for (let i = 0; i < 80; i++) {
+        const snowflake = document.createElement('div');
+        snowflake.textContent = '❄';
+        snowflake.style.position = 'absolute';
+        snowflake.style.color = '#ffffff';
+        snowflake.style.opacity = Math.random() * 0.8 + 0.4;
+        snowflake.style.fontSize = Math.random() * 15 + 12 + 'px';
+        snowflake.style.left = Math.random() * 100 + '%';
+        snowflake.style.top = '-10px';
+        snowflake.style.animation = `fall ${Math.random() * 8 + 6}s linear infinite`;
+        snowflake.style.animationDelay = `-${Math.random() * 10}s`;
+        snowContainer.appendChild(snowflake);
+      }
+    }
+
+    // CSS анимация снега
+    const style = document.createElement('style');
+    style.innerHTML = `
+      @keyframes fall {
+        to { transform: translateY(105vh); }
+      }
+    `;
+    document.head.appendChild(style);
+
     const tg = window.Telegram.WebApp;
     tg.expand();
     tg.ready();
@@ -31,20 +137,8 @@
     let cart = [];
 
     const products = [
-      { 
-        id: 1, 
-        name: "1000 Подписчиков Twitch", 
-        stars: 249, 
-        img: "https://i.imgur.com/QFVam4u.png", 
-        file: "https://pixeldrain.com/u/iCXFrMro" 
-      },
-      { 
-        id: 2, 
-        name: "5000 Лайков TikTok", 
-        stars: 199, 
-        img: "https://i.imgur.com/4k26xt8.jpeg", 
-        file: "https://pixeldrain.com/u/8ri8oPf2" 
-      }
+      { id: 1, name: "1000 Подписчиков Twitch", stars: 249, img: "https://i.imgur.com/QFVam4u.png", file: "https://pixeldrain.com/u/iCXFrMro" },
+      { id: 2, name: "5000 Лайков TikTok", stars: 199, img: "https://i.imgur.com/4k26xt8.jpeg", file: "https://pixeldrain.com/u/8ri8oPf2" }
     ];
 
     function renderProducts() {
@@ -66,23 +160,11 @@
 
     document.getElementById('cart').onclick = async () => {
       if (cart.length === 0) return tg.showAlert("Корзина пуста!");
-
-      try {
-        const response = await fetch('https://santa-shop.onrender.com/create-invoice', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ items: cart })
-        });
-
-        const data = await response.json();
-        if (data.invoiceLink) {
-          tg.openInvoice(data.invoiceLink);
-        }
-      } catch (e) {
-        tg.showAlert("Ошибка соединения");
-      }
+      tg.showAlert("Оплата через Telegram Stars (в разработке)");
     };
 
+    // Запуск снега
+    createSnow();
     renderProducts();
   </script>
 </body>
