@@ -6,34 +6,129 @@
   <title>Santa Shop</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
-    body { font-family: system-ui, sans-serif; background: #0a0a0a; color: #fff; margin: 0; padding: 0; }
-    .header { background: linear-gradient(90deg, #8b00ff, #ff00cc); padding: 25px; text-align: center; font-size: 32px; font-weight: bold; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; padding: 20px; }
-    .card { background: #1f1f1f; border-radius: 16px; overflow: hidden; text-align: center; }
+    body { font-family: system-ui, sans-serif; background: #0a001f; color: #fff; margin: 0; padding: 0; overflow: hidden; position: relative; }
+    .snow { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
+    .header { background: linear-gradient(90deg, #8b00ff, #ff00cc); padding: 25px; text-align: center; font-size: 32px; font-weight: bold; z-index: 2; position: relative; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 20px; padding: 20px; z-index: 2; position: relative; }
+    .card { background: rgba(31, 31, 47, 0.95); border-radius: 16px; overflow: hidden; text-align: center; transition: 0.3s; border: 1px solid rgba(139,0,255,0.3); }
+    .card:hover { transform: scale(1.05); box-shadow: 0 0 25px rgba(139,0,255,0.5); }
     .card img { width: 100%; height: 210px; object-fit: cover; }
     .card h3 { margin: 12px 0 6px; font-size: 16px; }
-    .price { color: #00ff9d; font-weight: bold; font-size: 20px; }
-    .buy-btn { background: #00c853; color: white; border: none; padding: 14px; width: 100%; font-size: 16px; cursor: pointer; }
+    .price { color: #00ffcc; font-weight: bold; font-size: 20px; }
+    .buy-btn { background: linear-gradient(#00ff88, #00cc66); color: white; border: none; padding: 14px; width: 100%; font-size: 16px; cursor: pointer; font-weight: bold; }
+
+    .cart { position: fixed; bottom: 20px; right: 20px; background: #8b00ff; padding: 16px 24px; border-radius: 50px; font-size: 20px; box-shadow: 0 0 20px rgba(139,0,255,0.8); cursor: pointer; z-index: 1000; }
+    
+    .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 3000; display: none; align-items: center; justify-content: center; }
+    .modal-content { background: #1f1f2f; padding: 25px; border-radius: 16px; width: 90%; max-width: 420px; }
+    input { width: 100%; padding: 14px; margin: 15px 0; background: #0f0f1f; border: 1px solid #8b00ff; color: white; border-radius: 10px; font-size: 16px; }
   </style>
 </head>
 <body>
+  <div class="snow" id="snow"></div>
   <div class="header">🎅 Santa Shop</div>
   <div class="grid" id="products"></div>
+  <div class="cart" id="cart">🛒 <span id="cart-count">0</span></div>
+
+  <!-- Модальное окно для ссылки -->
+  <div class="modal" id="linkModal">
+    <div class="modal-content">
+      <h2>Куда накручивать?</h2>
+      <p id="modalProductName" style="margin:10px 0 15px; color:#00ffcc;"></p>
+      <input type="text" id="userLink" placeholder="https://tiktok.com/@ник или twitch.tv/ник" />
+      <div style="margin-top:15px; display:flex; gap:10px;">
+        <button onclick="cancelAdd()" style="flex:1; padding:14px; background:#555; border:none; border-radius:10px; color:white;">Отмена</button>
+        <button onclick="confirmAdd()" style="flex:1; padding:14px; background:#00c853; border:none; border-radius:10px; color:white; font-weight:bold;">Добавить</button>
+      </div>
+    </div>
+  </div>
 
   <script>
+    // Снег
+    function createSnow() {
+      const container = document.getElementById('snow');
+      for (let i = 0; i < 80; i++) {
+        const flake = document.createElement('div');
+        flake.textContent = '❄';
+        flake.style.position = 'absolute';
+        flake.style.color = '#ffffff';
+        flake.style.opacity = Math.random() * 0.8 + 0.4;
+        flake.style.fontSize = Math.random() * 15 + 12 + 'px';
+        flake.style.left = Math.random() * 100 + '%';
+        flake.style.top = '-10px';
+        flake.style.animation = `fall ${Math.random() * 8 + 6}s linear infinite`;
+        flake.style.animationDelay = `-${Math.random() * 10}s`;
+        container.appendChild(flake);
+      }
+    }
+    const style = document.createElement('style');
+    style.innerHTML = `@keyframes fall { to { transform: translateY(105vh); } }`;
+    document.head.appendChild(style);
+
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+    tg.ready();
+
+    let cart = [];
+    let currentAddingId = null;
+
     const products = [
       { id: 1, name: "1000 Подписчиков Twitch", stars: 249, img: "https://i.imgur.com/QFVam4u.png" },
       { id: 2, name: "5000 Лайков TikTok", stars: 199, img: "https://i.imgur.com/4k26xt8.jpeg" }
     ];
 
-    document.getElementById('products').innerHTML = products.map(p => `
-      <div class="card">
-        <img src="${p.img}" alt="${p.name}">
-        <h3>${p.name}</h3>
-        <p class="price">${p.stars} ⭐ Stars</p>
-        <button class="buy-btn" onclick="alert('Добавлено: ${p.name}')">В корзину</button>
-      </div>
-    `).join('');
+    function renderProducts() {
+      document.getElementById('products').innerHTML = products.map(p => `
+        <div class="card">
+          <img src="${p.img}" alt="${p.name}">
+          <h3>${p.name}</h3>
+          <p class="price">${p.stars} ⭐ Stars</p>
+          <button class="buy-btn" onclick="prepareAddToCart(${p.id})">В корзину</button>
+        </div>
+      `).join('');
+    }
+
+    function prepareAddToCart(id) {
+      currentAddingId = id;
+      const product = products.find(p => p.id === id);
+      document.getElementById('modalProductName').textContent = product.name;
+      document.getElementById('userLink').value = "";
+      document.getElementById('linkModal').style.display = 'flex';
+    }
+
+    function confirmAdd() {
+      const link = document.getElementById('userLink').value.trim();
+      if (!link) return tg.showAlert("Введите ссылку!");
+
+      const product = products.find(p => p.id === currentAddingId);
+      cart.push({ ...product, link: link });
+
+      document.getElementById('linkModal').style.display = 'none';
+      updateCartCount();
+      tg.showToast("✅ Добавлено в корзину");
+    }
+
+    function cancelAdd() {
+      document.getElementById('linkModal').style.display = 'none';
+    }
+
+    function updateCartCount() {
+      document.getElementById('cart-count').textContent = cart.length;
+    }
+
+    document.getElementById('cart').onclick = () => {
+      if (cart.length === 0) return tg.showAlert("Корзина пуста!");
+      
+      let text = "Ваш заказ:\n\n";
+      cart.forEach(item => {
+        text += `• ${item.name}\n   Ссылка: ${item.link}\n\n`;
+      });
+      tg.showAlert(text);
+    };
+
+    // Запуск
+    createSnow();
+    renderProducts();
   </script>
 </body>
 </html>
