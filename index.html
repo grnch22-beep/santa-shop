@@ -38,12 +38,24 @@
       <input type="text" id="userLink" placeholder="https://tiktok.com/@ник или twitch.tv/ник" />
       <div style="margin-top:15px; display:flex; gap:10px;">
         <button onclick="cancelAdd()" style="flex:1; padding:14px; background:#555; border:none; border-radius:10px; color:white;">Отмена</button>
-        <button onclick="confirmAdd()" style="flex:1; padding:14px; background:#00c853; border:none; border-radius:10px; color:white; font-weight:bold;">Добавить</button>
+        <button onclick="confirmAdd()" style="flex:1; padding:14px; background:#00c853; border:none; border-radius:10px; color:white; font-weight:bold;">Добавить в корзину</button>
       </div>
     </div>
   </div>
 
   <script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+    tg.ready();
+
+    let cart = [];
+    let currentAddingId = null;
+
+    const products = [
+      { id: 1, name: "1000 Подписчиков Twitch", stars: 249, img: "https://i.imgur.com/QFVam4u.png" },
+      { id: 2, name: "5000 Лайков TikTok", stars: 199, img: "https://i.imgur.com/4k26xt8.jpeg" }
+    ];
+
     // Снег
     function createSnow() {
       const container = document.getElementById('snow');
@@ -64,18 +76,6 @@
     const style = document.createElement('style');
     style.innerHTML = `@keyframes fall { to { transform: translateY(105vh); } }`;
     document.head.appendChild(style);
-
-    const tg = window.Telegram.WebApp;
-    tg.expand();
-    tg.ready();
-
-    let cart = [];
-    let currentAddingId = null;
-
-    const products = [
-      { id: 1, name: "1000 Подписчиков Twitch", stars: 249, img: "https://i.imgur.com/QFVam4u.png" },
-      { id: 2, name: "5000 Лайков TikTok", stars: 199, img: "https://i.imgur.com/4k26xt8.jpeg" }
-    ];
 
     function renderProducts() {
       document.getElementById('products').innerHTML = products.map(p => `
@@ -118,8 +118,8 @@
 
     document.getElementById('cart').onclick = () => {
       if (cart.length === 0) return tg.showAlert("Корзина пуста!");
-      
-      let text = "Ваш заказ:\n\n";
+
+      let text = "📋 Ваш заказ:\n\n";
       cart.forEach(item => {
         text += `• ${item.name}\n   Ссылка: ${item.link}\n\n`;
       });
