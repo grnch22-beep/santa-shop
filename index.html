@@ -143,11 +143,41 @@
     let currentCategory = "all";
 
     const allProducts = [
-      { id: 1, category: "twitch", name: "1000 Подписчиков Twitch", stars: 249, img: "https://i.imgur.com/QFVam4u.png", price: 249 },
-      { id: 2, category: "tiktok", name: "5000 Лайков TikTok", stars: 199, img: "https://i.imgur.com/4k26xt8.jpeg", price: 199 },
-      { id: 3, category: "tiktok", name: "5000 Просмотров TikTok", stars: 179, img: "https://i.imgur.com/DONQTxr.jpeg", price: 179 },
-      { id: 4, category: "instagram", name: "1000 Подписчиков Instagram", stars: 229, img: "https://i.imgur.com/QFVam4u.png", price: 229 },
-      { id: 5, category: "youtube", name: "5000 Просмотров YouTube", stars: 179, img: "https://i.imgur.com/4k26xt8.jpeg", price: 179 }
+      { 
+        id: 1, 
+        category: "twitch", 
+        name: "1000 Подписчиков Twitch", 
+        price: 249, 
+        img: "https://i.imgur.com/QFVam4u.png" 
+      },
+      { 
+        id: 2, 
+        category: "tiktok", 
+        name: "5000 Лайков TikTok", 
+        price: 199, 
+        img: "https://i.imgur.com/4k26xt8.jpeg" 
+      },
+      { 
+        id: 3, 
+        category: "tiktok", 
+        name: "5000 Просмотров TikTok", 
+        price: 179, 
+        img: "https://i.imgur.com/DONQTxr.jpeg" 
+      },
+      { 
+        id: 4, 
+        category: "instagram", 
+        name: "1000 Подписчиков Instagram", 
+        price: 229, 
+        img: "https://i.imgur.com/QFVam4u.png" 
+      },
+      { 
+        id: 5, 
+        category: "youtube", 
+        name: "5000 Просмотров YouTube", 
+        price: 179, 
+        img: "https://i.imgur.com/4k26xt8.jpeg" 
+      }
     ];
 
     const categories = [
@@ -225,10 +255,11 @@
         total += item.price;
       });
 
-      text += `\nИтого: ${total} ₽\n\n`;
-      text += `Для оплаты переведите ${total} ₽ на карту:\n`;
-      text += `💳 2200 7000 0000 0000\n\n`;   // ← Замени на свою карту
-      text += `После оплаты пришлите чек сюда @твой_ник`;
+      text += `Итого: ${total} ₽\n\n`;
+      text += `Для оплаты переведите сумму на карту:\n`;
+      text += `💳 2200 7000 0000 0000\n\n`;   // ← Замени на свою карту!!!
+      text += `После оплаты обязательно пришлите чек боту или мне.\n\n`;
+      text += `Спасибо за покупку! 🎅`;
 
       tg.showAlert(text);
     };
