@@ -144,7 +144,7 @@
       border-radius: 16px; 
       width: 90%; 
       max-width: 480px; 
-      max-height: 85%; 
+      max-height: 85vh; 
       overflow-y: auto; 
     }
 
@@ -152,7 +152,7 @@
       background: #2a2a3a; 
       padding: 12px; 
       border-radius: 12px; 
-      margin-bottom: 10px; 
+      margin-bottom: 12px; 
       display: flex; 
       justify-content: space-between; 
       align-items: center; 
@@ -160,8 +160,9 @@
 
     .remove-btn { 
       color: #ff3366; 
-      font-size: 22px; 
+      font-size: 24px; 
       cursor: pointer; 
+      font-weight: bold; 
     }
   </style>
 </head>
@@ -173,14 +174,16 @@
   <div class="grid" id="products"></div>
   <div class="cart" id="cart">🛒 <span id="cart-count">0</span></div>
 
-  <!-- Модальное окно корзины -->
+  <!-- Корзина -->
   <div class="modal" id="cartModal">
     <div class="modal-content">
-      <h2>🛒 Ваша корзина</h2>
+      <h2>🛒 Корзина</h2>
       <div id="cartItems"></div>
-      <p style="margin:20px 0; font-size:18px; text-align:center;">Итого: <span id="totalPrice" style="color:#00ffcc; font-weight:bold;"></span> ₽</p>
+      <p style="margin: 20px 0; font-size: 18px; text-align: center;">
+        Итого: <span id="totalPrice" style="color:#00ffcc; font-weight: bold;"></span> ₽
+      </p>
       
-      <div style="display:flex; gap:10px; margin-top:20px;">
+      <div style="display: flex; gap: 10px; margin-top: 20px;">
         <button onclick="closeCart()" style="flex:1; padding:14px; background:#555; border:none; border-radius:12px; color:white;">Закрыть</button>
         <button onclick="payCart()" style="flex:2; padding:14px; background:#00c853; border:none; border-radius:12px; color:white; font-weight:bold;">Оплатить</button>
       </div>
@@ -246,7 +249,7 @@
 
     function renderProducts() {
       const filtered = currentCategory === "all" ? allProducts : allProducts.filter(p => p.category === currentCategory);
-
+      
       document.getElementById('products').innerHTML = filtered.map(p => `
         <div class="card">
           <img src="${p.img}" alt="${p.name}">
@@ -272,7 +275,9 @@
     }
 
     function showCart() {
-      if (cart.length === 0) return tg.showAlert("Корзина пуста!");
+      if (cart.length === 0) {
+        return tg.showAlert("Корзина пуста!");
+      }
 
       let html = '';
       let total = 0;
@@ -295,9 +300,11 @@
     }
 
     function removeItem(index) {
-      cart.splice(index, 1);
-      showCart();
-      updateCartCount();
+      if (confirm("Удалить товар из корзины?")) {
+        cart.splice(index, 1);
+        showCart();
+        updateCartCount();
+      }
     }
 
     function closeCart() {
@@ -305,7 +312,6 @@
     }
 
     function payCart() {
-      closeCart();
       if (cart.length === 0) return;
 
       let total = cart.reduce((sum, item) => sum + item.price, 0);
@@ -319,11 +325,11 @@
       text += `После оплаты пришлите чек`;
 
       tg.showAlert(text);
+      closeCart();
     }
 
+    // Инициализация
     document.getElementById('cart').onclick = showCart;
-
-    // Запуск
     createSnow();
     renderTabs();
     renderProducts();
